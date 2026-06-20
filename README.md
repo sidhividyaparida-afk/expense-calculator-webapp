@@ -56,14 +56,6 @@ Built with FastAPI, this project demonstrates modern backend development practic
 
 ```bash
 expense-calculator-webapp/backend
-│
-├── main.py
-├── models/
-├── routes/
-├── services/
-├── requirements.txt
-├── .gitignore
-└── README.md
 expense-calculator-webapp/frontend
 ```
 

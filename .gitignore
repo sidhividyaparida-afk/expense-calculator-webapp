@@ -1,5 +1,27 @@
 venv/
 __pycache__/
-.env
 *.log
 .vscode/
+node_modules/
+dist/
+build/
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.eslintcache
+vite.config.ts.timestamp-*
+*.tsbuildinfo
+temp/
+tmp/
+
+# package manager lock files (optional)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

@@ -55,7 +55,7 @@ Built with FastAPI, this project demonstrates modern backend development practic
 ## 📂 Project Structure
 
 ```bash
-expense-calculator-webapp/
+expense-calculator-webapp/backend
 │
 ├── main.py
 ├── models/
@@ -64,6 +64,7 @@ expense-calculator-webapp/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+expense-calculator-webapp/frontend
 ```
 
 ---

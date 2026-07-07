@@ -1,21 +1,16 @@
 from fastapi import FastAPI,HTTPException,Depends
-from app.routes.expense import router as expense_router
+# from app.routes.expense import router as expense_router
 from pydantic import BaseModel
 from typing import Annotated
-import models
-from database import engine, SessionLocal
+from app.models import expense
+from app.database import engine, SessionLocal
 from sqlalchemy.orm import Session
 
 app = FastAPI(
     title="Expense Calculator API",
     version="1.0.0"
 )
-models.Base.metadata.create_all(bind=engine)
-
-class PostBase(BaseModel):
-    title: str
-    amount: float
-    category: str
+expense.Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
@@ -32,16 +27,16 @@ def home(db: db_dependency):
         "message": "Expense Calculator API Running"
     }
 
-app.include_router(expense_router)
+# app.include_router(expense_router)
 
-@app.post("/expenses")
-def create_expense(expense: PostBase, db: db_dependency):
-    new_expense = models.Post(
-        title=expense.title,
-        amount=expense.amount,
-        category=expense.category
-    )
-    db.add(new_expense)
-    db.commit()
-    db.refresh(new_expense)
-    return new_expense
+# @app.post("/expenses")
+# def create_expense(expense: expense.Expense, db: db_dependency):
+#     new_expense = expense.Expense(
+#         title=expense.title,
+#         amount=expense.amount,
+#         category=expense.category
+#     )
+#     db.add(new_expense)
+#     db.commit()
+#     db.refresh(new_expense)
+#     return new_expense

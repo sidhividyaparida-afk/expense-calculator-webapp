@@ -1,8 +1,8 @@
 # from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
-from app.database import Base
+from app.database import base
 
-class Expense(Base):
+class Expense(base):
 #     id: int
 #     title: str
 #     amount: float

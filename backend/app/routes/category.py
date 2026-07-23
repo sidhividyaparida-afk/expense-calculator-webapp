@@ -13,9 +13,10 @@ def get_categories(db: db_dependency):
     return categories
 
 @category_router.post("")
-def create_category(name: str, db: db_dependency):
+def create_category(name: str, color_code: str, db: db_dependency):
     new_category = category.Category(
-        name=name
+        name=name,
+        color_code=color_code
     )
     existing_category = db.query(category.Category).filter_by(name=name).first()
     if existing_category:

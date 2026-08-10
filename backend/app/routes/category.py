@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.models import category
 from app.models.model import db_dependency
+from app.authentication import verify_token
 
 category_router = APIRouter(
     prefix="/categories",
@@ -8,12 +9,12 @@ category_router = APIRouter(
 )
 
 @category_router.get("")
-def get_categories(db: db_dependency):
+def get_categories(db: db_dependency, username: str = Depends(verify_token)):
     categories = db.query(category.Category).all()
     return categories
 
 @category_router.post("")
-def create_category(name: str, color_code: str, db: db_dependency):
+def create_category(name: str, color_code: str, db: db_dependency, username: str = Depends(verify_token)):
     new_category = category.Category(
         name=name,
         color_code=color_code

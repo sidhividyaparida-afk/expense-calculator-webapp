@@ -10,28 +10,16 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-# OAuth2
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# Password hashing functions
-def _bcrypt_safe_password(password: str) -> str:
-    return password.encode("utf-8")[:72].decode("utf-8", "ignore")
-
 def hash_password(password: str) -> str:
-    password = _bcrypt_safe_password(password)
-    encoded = password.encode("utf-8")
-    print(password, len(password), len(encoded))
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    plain_password = _bcrypt_safe_password(plain_password)
     return pwd_context.verify(plain_password, hashed_password)
 
-# JWT token functions
-# create token
 def create_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

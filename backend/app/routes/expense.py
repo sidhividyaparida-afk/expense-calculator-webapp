@@ -16,8 +16,6 @@ def get_expenses(db: db_dependency, username: str = Depends(verify_token)):
 @expense_router.post("")
 def create_expense(title: str, amount: float, category_id: int, db: db_dependency, username: str = Depends(verify_token)):
 
-    # Faster primary-key lookup
-
     c = db.get(category.Category, category_id)
     if not c:
         raise HTTPException(

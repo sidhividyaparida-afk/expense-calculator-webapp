@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.models.model import db_dependency
 from app.models import auth
 from app import authentication, schemas
-# from app.database import engine
 
 auth_router = APIRouter(tags=["Authentication"])
 
@@ -25,7 +23,6 @@ def register(user: schemas.UserCreate, db: db_dependency):
     return {"message": "User registered successfully", "user": {"username": new_user.username}}
 
 @auth_router.post("/login", response_model=schemas.Token)
-# def login(db: db_dependency, form_data: OAuth2PasswordRequestForm = Depends()):
 def login(db: db_dependency, form_data: schemas.Login):
     user = db.query(auth.User).filter(auth.User.username == form_data.username).first()
     if not user:
@@ -41,9 +38,7 @@ def login(db: db_dependency, form_data: schemas.Login):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @auth_router.get("/profile")
-def profile(username: str = Depends(authentication.verify_token)):
-
-    print(username)
+def profile( username: str = Depends(authentication.verify_token)):
     return {
         "message": "You are authorized",
         "username": username

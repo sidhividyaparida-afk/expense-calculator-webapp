@@ -22,10 +22,7 @@ def create_category(name: str, color_code: str, db: db_dependency, username: str
     existing_category = db.query(category.Category).filter_by(name=name).first()
     if existing_category:
         return {"message": f"Category with name '{name}' already exists", "category": new_category}
-    # category = db.query(category.Category).get(name=name)
-    # if category:
-    #     return {"message": f"Category with name '{name}' already exists", "category": new_category}
-
+    
     db.add(new_category)
     db.commit()
     db.refresh(new_category)

@@ -11,6 +11,3 @@ class Token(BaseModel):
 class Login(BaseModel):
     username: str
     password: str
-
-class TokenData(BaseModel):
-    username: str

@@ -10,6 +10,5 @@ class Expense(base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(20), index=True, nullable=False)
     amount = Column(Float, nullable=False)
-    # category = Column(String(10), nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"))
     category = relationship("Category", back_populates="expenses")

@@ -1,4 +1,4 @@
-from app.models import category, expense
+from app.models import category, expense, auth
 from app.database import engine, sessionlocal
 from typing import Annotated
 from sqlalchemy.orm import Session
@@ -6,6 +6,7 @@ from fastapi import Depends
 
 category.base.metadata.create_all(bind=engine)
 expense.base.metadata.create_all(bind=engine)
+auth.base.metadata.create_all(bind=engine)
 
 def get_db():
     db = sessionlocal()

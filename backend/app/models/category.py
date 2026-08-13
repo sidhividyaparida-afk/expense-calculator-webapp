@@ -8,4 +8,5 @@ class Category(base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(10), unique=True, nullable=False)
+    color_code = Column(String(7), nullable=False, default="#FFFFFF")
     expenses = relationship("Expense", back_populates="category")

@@ -12,7 +12,6 @@ function Navbar() {
         <div className="space-x-6">
           <Link to="/">Dashboard</Link>
           <Link to="/expenses">Expenses</Link>
-          <Link to="/categories">Categories</Link>
           <Link to="/analytics">Analytics</Link>
         </div>
 

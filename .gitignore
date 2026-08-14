@@ -21,7 +21,7 @@ vite.config.ts.timestamp-*
 temp/
 tmp/
 
-# package manager lock files (optional)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
+package manager lock files (optional)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

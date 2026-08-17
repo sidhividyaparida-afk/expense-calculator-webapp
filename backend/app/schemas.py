@@ -11,3 +11,8 @@ class Token(BaseModel):
 class Login(BaseModel):
     username: str
     password: str
+
+class Expense(BaseModel):
+    title: str
+    amount: float
+    category_id: int

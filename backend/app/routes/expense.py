@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.models import expense, category
 from app.models.model import db_dependency
 from app.authentication import verify_token
-from app.schemas import Expense, ExpenseResponse
-from app.routes.user import check_user_exists
+from app.schemas import Expense
 
 expense_router = APIRouter(
     prefix="/expenses",
@@ -12,15 +11,13 @@ expense_router = APIRouter(
 
 @expense_router.get("")
 def get_expenses(db: db_dependency, user_id: int = Depends(verify_token)):
-    user = check_user_exists(db, user_id)
     expenses = db.query(expense.Expense).filter(expense.Expense.user_id == user_id).all()
     return expenses
 
 @expense_router.post("")
 def create_expense(expense_data: Expense, db: db_dependency, user_id: int = Depends(verify_token)):
 
-    user = check_user_exists(db, user_id)
-    c = db.get(category.Category, expense_data.category_id)
+    c = db.query(category.Category).filter(category.Category.user_id==user_id, category.Category.id==expense_data.category_id)
     if not c:
         raise HTTPException(status_code=404, detail=f"Category with id {expense_data.category_id} not found")
 
@@ -38,12 +35,11 @@ def create_expense(expense_data: Expense, db: db_dependency, user_id: int = Depe
 
 @expense_router.put("/{expense_id}")
 def update_expense(expense_id: int, expense_data: Expense, db: db_dependency, user_id: int = Depends(verify_token)):
-    user = check_user_exists(db, user_id)
     expense_to_update = db.query(expense.Expense).filter(expense.Expense.id==expense_id, expense.Expense.user_id == user_id).first()
     if not expense_to_update:
         raise HTTPException(status_code=404, detail=f"Expense with id {expense_id} not found")
 
-    c = db.get(category.Category, expense_data.category_id)
+    c = db.query(category.Category).filter(category.Category.user_id==user_id, category.Category.id==expense_data.category_id)
     if not c:
         raise HTTPException(status_code=404, detail=f"Category with id {expense_data.category_id} not found")
 
@@ -57,7 +53,6 @@ def update_expense(expense_id: int, expense_data: Expense, db: db_dependency, us
 
 @expense_router.delete("/{expense_id}")
 def delete_expense(expense_id: int, db: db_dependency, user_id: int = Depends(verify_token)):
-    user = check_user_exists(db, user_id)
     expense_to_delete = db.query(expense.Expense).filter(expense.Expense.id==expense_id, expense.Expense.user_id == user_id).first()
     if not expense_to_delete:
         raise HTTPException(status_code=404, detail=f"Expense with id {expense_id} not found")

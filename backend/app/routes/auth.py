@@ -6,7 +6,7 @@ from app import authentication, schemas
 auth_router = APIRouter(tags=["Authentication"])
 
 @auth_router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(user: schemas.UserCreate, db: db_dependency):
+def register(user: schemas.User, db: db_dependency):
 
     existing_user = db.query(auth.User).filter(auth.User.username == user.username).first()
     if existing_user:
@@ -23,23 +23,16 @@ def register(user: schemas.UserCreate, db: db_dependency):
     return {"message": "User registered successfully", "user": {"username": new_user.username}}
 
 @auth_router.post("/login", response_model=schemas.Token)
-def login(db: db_dependency, form_data: schemas.Login):
-    user = db.query(auth.User).filter(auth.User.username == form_data.username).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username")
+def login(db: db_dependency, user: schemas.User):
+    db_user = db.query(auth.User).filter(auth.User.username == user.username).first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect user id")
 
     else:
-        correct_password = authentication.verify_password(form_data.password, user.password_hash)
+        correct_password = authentication.verify_password(user.password, db_user.password_hash)
         if not correct_password:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
 
-    access_token = authentication.create_token(data={"username": user.username})
+    access_token = authentication.create_token(data={"user_id": db_user.id})
 
     return {"access_token": access_token, "token_type": "bearer"}
-
-@auth_router.get("/profile")
-def profile( username: str = Depends(authentication.verify_token)):
-    return {
-        "message": "You are authorized",
-        "username": username
-    }

@@ -9,10 +9,19 @@ class Token(BaseModel):
     token_type: str
 
 class Login(BaseModel):
-    username: str
+    user_id: int
     password: str
 
 class Expense(BaseModel):
     title: str
     amount: float
     category_id: int
+
+class ExpenseResponse(BaseModel):
+    id: int
+    title: str
+    amount: float
+    category_id: int
+    user_id: int
+    class Config:
+        from_attributes = True

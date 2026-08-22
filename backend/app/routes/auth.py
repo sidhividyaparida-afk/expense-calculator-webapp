@@ -24,22 +24,15 @@ def register(user: schemas.UserCreate, db: db_dependency):
 
 @auth_router.post("/login", response_model=schemas.Token)
 def login(db: db_dependency, form_data: schemas.Login):
-    user = db.query(auth.User).filter(auth.User.username == form_data.username).first()
+    user = db.query(auth.User).filter(auth.User.id == form_data.user_id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect user id")
 
     else:
         correct_password = authentication.verify_password(form_data.password, user.password_hash)
         if not correct_password:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
 
-    access_token = authentication.create_token(data={"username": user.username})
+    access_token = authentication.create_token(data={"user_id": user.id})
 
     return {"access_token": access_token, "token_type": "bearer"}
-
-@auth_router.get("/profile")
-def profile( username: str = Depends(authentication.verify_token)):
-    return {
-        "message": "You are authorized",
-        "username": username
-    }

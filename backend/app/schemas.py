@@ -12,3 +12,7 @@ class Expense(BaseModel):
     title: str
     amount: float
     category_id: int
+
+class Category(BaseModel):
+    name: str
+    color_code: str

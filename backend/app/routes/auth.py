@@ -10,7 +10,7 @@ def register(user: schemas.User, db: db_dependency):
 
     existing_user = db.query(auth.User).filter(auth.User.username == user.username).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists")
+        raise HTTPException(status_code=409, detail="Username already exists")
 
     hashed_password = authentication.hash_password(user.password)
 

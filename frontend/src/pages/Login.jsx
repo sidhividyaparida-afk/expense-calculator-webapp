@@ -21,8 +21,9 @@ export default function Login() {
             );
             localStorage.setItem(
                 "user",
-                JSON.stringify(response.data.user)
+                JSON.stringify(response.data.username)
             );
+            console.log("Login successful:", response.data);
             toast.success("Login successful");
             navigate("/");
         } catch (error) {

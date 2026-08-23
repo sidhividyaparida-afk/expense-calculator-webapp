@@ -3,14 +3,18 @@ import api from "../api/api";
 import toast from "react-hot-toast";
 import { Plus, Wallet } from "lucide-react";
 import { CATEGORY_COLORS } from "../constants/categoryColors";
+import { FaEdit, FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
 
 export default function Expense() {
     const [expenses, setExpenses] = useState([]);
+    const [editExpense, setEditExpense] = useState([]);
+    const [editingCategory, setEditingCategory] = useState([]);
     const [categories, setCategories] = useState([]);
     const [colorCode, setColorCode] = useState("#E5F1ED");
 
     const [showExpenseModal, setShowExpenseModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
@@ -48,7 +52,130 @@ export default function Expense() {
 
     const categoryMap = Object.fromEntries(
       categories.map(category => [category.id, category])
-  );
+    );
+
+    const openEditExpense = (expense) => {
+        setEditExpense(expense);
+    
+        setTitle(expense.title);
+        setAmount(expense.amount);
+        setCategoryId(String(expense.category_id));
+    
+        setShowExpenseModal(true);
+    };
+
+    const updateExpense = async () => {
+        if (!title || !amount || !categoryId) {
+            toast.error("Please fill all fields");
+            return;
+        }
+    
+        try {
+            await api.put(`/expenses/${editExpense.id}`, {
+                title: title,
+                amount: Number(amount),
+                category_id: Number(categoryId)
+            });
+    
+            toast.success("Expense updated successfully");
+    
+            setTitle("");
+            setAmount("");
+            setCategoryId("");
+    
+            setEditExpense(null);
+            setShowExpenseModal(false);
+    
+            fetchExpenses();
+    
+        } catch (err) {
+            toast.error(
+                err.response?.data?.detail ||
+                "Unable to update expense"
+            );
+        }
+    };
+
+    const deleteExpense = async (expenseId) => {
+        try {
+            await api.delete(`/expenses/${expenseId}`);
+    
+            toast.success("Expense deleted successfully");
+    
+            fetchExpenses();
+    
+        } catch (err) {
+            toast.error(
+                err.response?.data?.detail ||
+                "Unable to delete expense"
+            );
+        }
+    };
+
+    const openEditCategory = (category) => {
+        setEditingCategory(category);
+    
+        setCategoryName(category.name);
+        setColorCode(category.color_code);
+    
+        setShowCategoryModal(true);
+    };
+
+    const updateCategory = async () => {
+
+        if (!categoryName.trim()) {
+            toast.error("Please enter category name");
+            return;
+        }
+    
+        try {
+    
+            await api.put(
+                `/categories/${editingCategory.id}`,
+                {
+                    name: categoryName,
+                    color_code: colorCode
+                }
+            );
+    
+            toast.success("Category updated successfully");
+    
+            setEditingCategory(null);
+            setCategoryName("");
+            setColorCode("#FFFFFF");
+            setShowCategoryModal(false);
+    
+            fetchCategories();
+    
+        } catch (error) {
+    
+            toast.error(
+                error.response?.data?.detail ||
+                "Unable to update category"
+            );
+        }
+    };
+
+    const deleteCategory = async (categoryId) => {
+
+        try {
+    
+            await api.delete(
+                `/categories/${categoryId}`
+            );
+    
+            toast.success("Category deleted successfully");
+    
+            fetchCategories();
+    
+        } catch (error) {
+    
+            toast.error(
+                error.response?.data?.detail ||
+                "Unable to delete category"
+            );
+        }
+    };
 
     const addExpense = async () => {
         if (!title || !amount || !categoryId) {
@@ -57,13 +184,12 @@ export default function Expense() {
         }
 
         try {
-            await api.post("/expenses", null, {
-                params: {
+            await api.post("/expenses", {
                     title,
                     amount,
                     category_id: categoryId,
                 },
-            });
+            );
 
             toast.success("Expense Added Successfully");
 
@@ -87,12 +213,10 @@ export default function Expense() {
   
       try {
   
-          await api.post("/categories", null, {
-              params: {
+          await api.post("/categories", {
                   name: categoryName,
                   color_code: colorCode
-              }
-          });
+              });
   
           toast.success("Category Added Successfully");
   
@@ -151,39 +275,147 @@ export default function Expense() {
 
                 <div className="grid md:grid-cols-1 gap-5 mt-8">
 
-                {expenses.map((expense) => {
-                          const category = categoryMap[expense.category_id];
+                    {expenses.map((expense) => {
 
-                          return (
-                              <div
-                                  key={expense.id}
-                                  className="rounded-xl shadow-md p-5"
-                                  style={{
-                                      backgroundColor: category?.color_code || "#fff"
-                                  }}
-                              >
-                                  <div className="flex justify-between">
+                        const category = categoryMap[expense.category_id];
 
-                                      <div>
+                        return (
+                            <div
+                                key={expense.id}
+                                className="
+                                    group
+                                    relative
+                                    rounded-xl
+                                    shadow-md
+                                    p-5
+                                    transition-all
+                                    duration-300
+                                    ease-in-out
+                                    hover:scale-[1.02]
+                                    hover:shadow-xl
+                                    cursor-pointer
+                                "
+                                style={{
+                                    backgroundColor:
+                                        category?.color_code || "#fff"
+                                }}
+                            >
 
-                                          <h2 className="font-semibold text-lg">
-                                              {expense.title}
-                                          </h2>
+                                {/* Expense Content */}
 
-                                          
-                                            Category #{category?.name}
-                                          
+                                <div className="
+                                    flex
+                                    justify-between
+                                    items-center
+                                    transition-all
+                                    duration-300
+                                    group-hover:opacity-40
+                                ">
 
-                                      </div>
+                                    <div>
 
-                                      <h2 className="text-2xl font-bold text-green-600">
-                                          ₹{expense.amount}
-                                      </h2>
+                                        <h2 className="font-semibold text-lg">
+                                            {expense.title}
+                                        </h2>
 
-                                  </div>
-                              </div>
-                          );
-                      })}
+                                        <p className="text-gray-600">
+                                            Category: {category?.name || "Unknown"}
+                                        </p>
+
+                                    </div>
+
+                                    <h2 className="text-2xl font-bold text-white">
+                                        ₹{expense.amount}
+                                    </h2>
+
+                                </div>
+
+
+                                {/* Hover Overlay */}
+
+                                <div className="
+                                    absolute
+                                    inset-0
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-4
+
+                                    opacity-0
+                                    group-hover:opacity-100
+
+                                    transition-opacity
+                                    duration-300
+                                ">
+
+                                    {/* Edit */}
+
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            openEditExpense(expense);
+                                        }}
+                                        className="
+                                            w-12
+                                            h-12
+                                            rounded-full
+                                            bg-white
+                                            text-indigo-600
+                                            shadow-lg
+
+                                            flex
+                                            items-center
+                                            justify-center
+
+                                            hover:bg-indigo-600
+                                            hover:text-white
+                                            hover:scale-110
+
+                                            transition-all
+                                            duration-200
+                                        "
+                                        title="Edit Expense"
+                                    >
+                                        <FaEdit size={18} />
+                                    </button>
+
+
+                                    {/* Delete */}
+
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteExpense(expense.id);
+                                        }}
+                                        className="
+                                            w-12
+                                            h-12
+                                            rounded-full
+                                            bg-white
+                                            text-red-600
+                                            shadow-lg
+
+                                            flex
+                                            items-center
+                                            justify-center
+
+                                            hover:bg-red-600
+                                            hover:text-white
+                                            hover:scale-110
+
+                                            transition-all
+                                            duration-200
+                                        "
+                                        title="Delete Expense"
+                                    >
+                                        <FaTrash size={18} />
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        );
+                    })}
 
                 </div>
 
@@ -220,51 +452,230 @@ export default function Expense() {
                             className="w-full border rounded-lg p-3 mb-4"
                         />
 
-                        <select
-                            value={categoryId}
-                            onChange={(e) => {
-                                if (e.target.value === "add") {
-                                    setShowCategoryModal(true);
-                                } else {
-                                    setCategoryId(e.target.value);
-                                }
-                            }}
-                            className="w-full border rounded-lg p-3"
+                        <div className="relative">
+
+                        <label className="block font-medium mb-2">
+                            Category
+                        </label>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setShowCategoryDropdown(
+                                    !showCategoryDropdown
+                                )
+                            }
+                            className="
+                                w-full
+                                border
+                                rounded-lg
+                                px-4
+                                py-3
+                                bg-white
+                                flex
+                                items-center
+                                justify-between
+                            "
                         >
-                            <option value="">
-                                Select Category
-                            </option>
 
-                            {categories.map((category) => (
-                                <option
-                                    key={category.id}
-                                    value={category.id}
-                                >
+                            <div className="flex items-center gap-2">
+
+                                {categoryId ? (
+                                    <>
+                                        <span
+                                            className="w-3 h-3 rounded-full"
+                                            style={{
+                                                backgroundColor:
+                                                    categoryMap[categoryId]?.color_code
+                                            }}
+                                        />
+
+                                        <span>
+                                            {categoryMap[categoryId]?.name}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-gray-400">
+                                        Select category
+                                    </span>
+                                )}
+
+                            </div>
+
+                            <FaChevronDown
+                                size={16}
+                                className={`transition-transform ${
+                                    showCategoryDropdown ? "rotate-180" : ""
+                                }`}
+                            />
+
+                        </button>
+
+
+                        {showCategoryDropdown && (
+
+                            <div
+                                className="
+                                    absolute
+                                    z-50
+                                    mt-2
+                                    w-full
+                                    bg-white
+                                    border
+                                    rounded-xl
+                                    shadow-xl
+                                    overflow-hidden
+                                "
+                            >
+
+                                {categories.map((category) => (
+
                                     <div
-                                              className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer"
-                                              >
+                                        key={category.id}
+                                        className="
+                                            flex
+                                            items-center
+                                            justify-between
+                                            px-4
+                                            py-3
+                                            hover:bg-gray-50
+                                            transition
+                                        "
+                                    >
 
-                                              <div
-                                              className="w-4 h-4 rounded-full"
-                                              style={{
-                                              backgroundColor:category.color_code
-                                              }}
-                                              />
+                                        {/* Category */}
 
-                                              <span>
-                                              {category.name}
-                                              </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setCategoryId(
+                                                    String(category.id)
+                                                );
 
-                                              </div>
-                                </option>
-                            ))}
+                                                setShowCategoryDropdown(false);
+                                            }}
+                                            className="
+                                                flex
+                                                items-center
+                                                gap-3
+                                                flex-1
+                                                text-left
+                                            "
+                                        >
 
-                            <option value="add">
-                                ➕ Add New Category
-                            </option>
+                                            <span
+                                                className="w-4 h-4 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        category.color_code
+                                                }}
+                                            />
 
-                        </select>
+                                            <span>
+                                                {category.name}
+                                            </span>
 
+                                        </button>
+
+
+                                        {/* Actions */}
+
+                                        <div className="flex items-center gap-1">
+
+                                            {/* Edit */}
+
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+
+                                                    setShowCategoryDropdown(false);
+
+                                                    openEditCategory(category);
+                                                }}
+                                                className="
+                                                    p-2
+                                                    rounded-lg
+                                                    text-indigo-600
+                                                    hover:bg-indigo-100
+                                                    transition
+                                                "
+                                                title="Edit category"
+                                            >
+                                                <FaEdit size={14} />
+                                            </button>
+
+
+                                            {/* Delete */}
+
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+
+                                                    setShowCategoryDropdown(false);
+
+                                                    deleteCategory(category.id);
+                                                }}
+                                                className="
+                                                    p-2
+                                                    rounded-lg
+                                                    text-red-600
+                                                    hover:bg-red-100
+                                                    transition
+                                                "
+                                                title="Delete category"
+                                            >
+                                                <FaTrash size={14} />
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                ))}
+
+
+                                {/* Add Category */}
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowCategoryDropdown(false);
+
+                                        setEditingCategory(null);
+                                        setCategoryName("");
+                                        setColorCode("#FFFFFF");
+
+                                        setShowCategoryModal(true);
+                                    }}
+                                    className="
+                                        w-full
+                                        flex
+                                        items-center
+                                        gap-2
+                                        px-4
+                                        py-3
+                                        border-t
+                                        text-indigo-600
+                                        font-medium
+                                        hover:bg-indigo-50
+                                    "
+                                >
+
+                                    <FaPlus size={13} />
+
+                                    Add Category
+
+                                </button>
+
+                            </div>
+
+                        )}
+
+                        </div>
+
+                        
                         <div className="flex justify-end gap-3 mt-6">
 
                             <button
@@ -277,7 +688,7 @@ export default function Expense() {
                             </button>
 
                             <button
-                                onClick={addExpense}
+                                onClick={!editExpense ? addExpense : updateExpense}
                                 className="bg-indigo-600 text-white px-5 py-2 rounded-lg"
                             >
                                 Save
@@ -300,7 +711,7 @@ export default function Expense() {
                 <div className="w-[500px] rounded-3xl bg-white shadow-2xl p-7">
 
                     <h2 className="text-3xl font-bold mb-1">
-                        Add Category
+                        {!editingCategory ? 'Add Category' : 'Update Category'}
                     </h2>
 
                     <p className="text-gray-500 mb-6">
@@ -369,32 +780,54 @@ export default function Expense() {
 
                         <div className="grid grid-cols-5 gap-5 mt-4">
 
-                            {CATEGORY_COLORS.map((color)=>(
+                            {CATEGORY_COLORS.map((color) => (
 
                                 <button
                                     key={color.code}
                                     type="button"
                                     title={color.name}
-                                    onClick={()=>setColorCode(color.code)}
-                                    className={`relative w-14 h-14 rounded-full border-4
-                                    transition-all duration-200 hover:scale-110
+                                    onClick={() => setColorCode(color.code)}
+                                    className={`
+                                        relative
+                                        w-14
+                                        h-14
+                                        rounded-full
+                                        border-4
+                                        transition-all
+                                        duration-200
+                                        hover:scale-110
+                                        focus:outline-none
+                                        focus:ring-2
+                                        focus:ring-indigo-400
+                                        focus:ring-offset-2
 
-                                    ${
-                                        colorCode===color.code
-                                        ?"border-indigo-600 shadow-xl scale-110"
-                                        :"border-gray-300"
-                                    }`}
+                                        ${
+                                            colorCode === color.code
+                                                ? "border-indigo-600 shadow-xl scale-110"
+                                                : "border-white shadow-md"
+                                        }
+                                    `}
                                     style={{
-                                        backgroundColor:color.code
+                                        backgroundColor: color.code
                                     }}
                                 >
 
-                                    {colorCode===color.code && (
+                                    {colorCode === color.code && (
 
-                                        <span className="absolute inset-0 flex items-center justify-center text-xl">
-
+                                        <span
+                                            className="
+                                                absolute
+                                                inset-0
+                                                flex
+                                                items-center
+                                                justify-center
+                                                text-white
+                                                text-xl
+                                                font-bold
+                                                drop-shadow-md
+                                            "
+                                        >
                                             ✓
-
                                         </span>
 
                                     )}
@@ -426,11 +859,11 @@ export default function Expense() {
                         </button>
 
                         <button
-                            onClick={addCategory}
+                            onClick={!editingCategory ? addCategory : updateCategory}
                             className="px-6 py-3 rounded-xl bg-indigo-600
                             text-white hover:bg-indigo-700"
                         >
-                            Add Category
+                            {!editingCategory ? 'Add Category' : 'Update Category'}
                         </button>
 
                     </div>

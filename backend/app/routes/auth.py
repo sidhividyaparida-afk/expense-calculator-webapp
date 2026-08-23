@@ -35,4 +35,4 @@ def login(db: db_dependency, user: schemas.User):
 
     access_token = authentication.create_token(data={"user_id": db_user.id})
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "username": db_user.username}

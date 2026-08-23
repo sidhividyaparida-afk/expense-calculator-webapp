@@ -19,7 +19,6 @@ def create_category(category_data: Category, db: db_dependency, user_id: str = D
     existing_category = db.query(category.Category).filter(category.Category.user_id == user_id, category.Category.name == category_data.name).first()
     if existing_category:
         raise HTTPException(status_code=409, detail= f"Category with name '{category_data.name}' already exists")
-        return {"message": f"Category with name '{category_data.name}' already exists", "category": existing_category}
     
     new_category = category.Category(
         name=category_data.name,

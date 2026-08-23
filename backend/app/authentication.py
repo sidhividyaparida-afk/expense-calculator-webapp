@@ -37,11 +37,11 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security_sc
     token = token.split(" ")[-1]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("username")
-        if username is None:
+        user_id = payload.get("user_id")
+        if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
 
-        return username
+        return user_id
     
     except ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired. Please log in again or refresh.", headers={"WWW-Authenticate": "Bearer"})

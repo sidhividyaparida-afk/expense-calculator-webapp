@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class UserCreate(BaseModel):
+class User(BaseModel):
     username: str
     password: str
 
@@ -8,6 +8,11 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class Login(BaseModel):
-    username: str
-    password: str
+class Expense(BaseModel):
+    title: str
+    amount: float
+    category_id: int
+
+class Category(BaseModel):
+    name: str
+    color_code: str

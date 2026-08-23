@@ -129,7 +129,7 @@ export default function Expense() {
     
         try {
     
-            await api.put(
+            const response = await api.put(
                 `/categories/${editingCategory.id}`,
                 {
                     name: categoryName,
@@ -138,7 +138,10 @@ export default function Expense() {
             );
     
             toast.success("Category updated successfully");
-    
+
+            const cat = response.data.category;
+
+            setCategoryId(cat.id)
             setEditingCategory(null);
             setCategoryName("");
             setColorCode("#FFFFFF");
@@ -211,7 +214,7 @@ export default function Expense() {
   
       try {
   
-          await api.post("/categories", {
+          const response = await api.post("/categories", {
                   name: categoryName,
                   color_code: colorCode
               });
@@ -219,9 +222,14 @@ export default function Expense() {
           toast.success("Category Added Successfully");
   
           fetchCategories();
-  
-          setCategoryName("");
-          setColorCode("#E5F1ED");
+
+          const cat = response.data.category;
+
+          console.log(cat);
+        
+          setCategoryId(cat.id)
+          setCategoryName(cat.name);
+          setColorCode(cat.color_code);
   
           setShowCategoryModal(false);
   

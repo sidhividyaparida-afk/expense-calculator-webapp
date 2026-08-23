@@ -6,8 +6,8 @@ import { FaEdit, FaTrash, FaPlus, FaChevronDown, FaWallet } from "react-icons/fa
 
 export default function Expense() {
     const [expenses, setExpenses] = useState([]);
-    const [editExpense, setEditExpense] = useState([]);
-    const [editingCategory, setEditingCategory] = useState([]);
+    const [editExpense, setEditExpense] = useState(null);
+    const [editingCategory, setEditingCategory] = useState(null);
     const [categories, setCategories] = useState([]);
     const [colorCode, setColorCode] = useState("#E5F1ED");
 
@@ -187,8 +187,7 @@ export default function Expense() {
                     title,
                     amount,
                     category_id: categoryId,
-                },
-            );
+                });
 
             toast.success("Expense Added Successfully");
 

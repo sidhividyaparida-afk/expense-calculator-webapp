@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import { Plus, Wallet } from "lucide-react";
 import { CATEGORY_COLORS } from "../constants/categoryColors";
-import { FaEdit, FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaChevronDown, FaWallet } from "react-icons/fa";
 
 export default function Expense() {
     const [expenses, setExpenses] = useState([]);
@@ -245,13 +244,13 @@ export default function Expense() {
 
                     <div className="flex items-center gap-3">
 
-                        <Wallet size={36} />
+                        <FaWallet size={32} />
 
                         <div>
 
                             <p>Total Expense</p>
 
-                            <h1 className="text-5xl font-bold mt-2">
+                            <h1 className="text-4xl pl-3 font-bold mt-2">
                                 ₹{totalExpense}
                             </h1>
 
@@ -267,7 +266,7 @@ export default function Expense() {
                         onClick={() => setShowExpenseModal(true)}
                         className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl"
                     >
-                        <Plus size={18} />
+                        <FaPlus size={18} />
                         Add Expense
                     </button>
 
